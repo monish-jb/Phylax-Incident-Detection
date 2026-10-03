@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import (
     Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, JSON
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship as sql_relationship
 
 from backend.app.core.database import Base
 
@@ -20,10 +20,10 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    videos = relationship("Video", back_populates="user", cascade="all, delete-orphan")
-    cameras = relationship("Camera", back_populates="user", cascade="all, delete-orphan")
-    emergency_contacts = relationship("EmergencyContact", back_populates="user", cascade="all, delete-orphan")
-    detector_settings = relationship("DetectorSetting", back_populates="user", cascade="all, delete-orphan")
+    videos = sql_relationship("Video", back_populates="user", cascade="all, delete-orphan")
+    cameras = sql_relationship("Camera", back_populates="user", cascade="all, delete-orphan")
+    emergency_contacts = sql_relationship("EmergencyContact", back_populates="user", cascade="all, delete-orphan")
+    detector_settings = sql_relationship("DetectorSetting", back_populates="user", cascade="all, delete-orphan")
 
 
 class Camera(Base):
@@ -38,10 +38,10 @@ class Camera(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    user = relationship("User", back_populates="cameras")
-    videos = relationship("Video", back_populates="camera")
-    zones = relationship("Zone", back_populates="camera", cascade="all, delete-orphan")
-    schedules = relationship("Schedule", back_populates="camera", cascade="all, delete-orphan")
+    user = sql_relationship("User", back_populates="cameras")
+    videos = sql_relationship("Video", back_populates="camera")
+    zones = sql_relationship("Zone", back_populates="camera", cascade="all, delete-orphan")
+    schedules = sql_relationship("Schedule", back_populates="camera", cascade="all, delete-orphan")
 
 
 class Zone(Base):
@@ -54,7 +54,7 @@ class Zone(Base):
     detector_types = Column(JSON, nullable=True)  # List of detector IDs tied to this zone
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    camera = relationship("Camera", back_populates="zones")
+    camera = sql_relationship("Camera", back_populates="zones")
 
 
 class Schedule(Base):
@@ -69,7 +69,7 @@ class Schedule(Base):
     active_detectors = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    camera = relationship("Camera", back_populates="schedules")
+    camera = sql_relationship("Camera", back_populates="schedules")
 
 
 class DetectorSetting(Base):
@@ -82,7 +82,7 @@ class DetectorSetting(Base):
     enabled = Column(Boolean, default=True)
     config_json = Column(JSON, nullable=True)  # Thresholds, cooldowns, parameters
 
-    user = relationship("User", back_populates="detector_settings")
+    user = sql_relationship("User", back_populates="detector_settings")
 
 
 class Video(Base):
@@ -107,10 +107,10 @@ class Video(Base):
     max_score = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    user = relationship("User", back_populates="videos")
-    camera = relationship("Camera", back_populates="videos")
-    analysis_job = relationship("AnalysisJob", back_populates="video", uselist=False, cascade="all, delete-orphan")
-    incidents = relationship("Incident", back_populates="video", cascade="all, delete-orphan")
+    user = sql_relationship("User", back_populates="videos")
+    camera = sql_relationship("Camera", back_populates="videos")
+    analysis_job = sql_relationship("AnalysisJob", back_populates="video", uselist=False, cascade="all, delete-orphan")
+    incidents = sql_relationship("Incident", back_populates="video", cascade="all, delete-orphan")
 
 
 class AnalysisJob(Base):
@@ -125,7 +125,7 @@ class AnalysisJob(Base):
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
 
-    video = relationship("Video", back_populates="analysis_job")
+    video = sql_relationship("Video", back_populates="analysis_job")
 
 
 class Incident(Base):
@@ -147,7 +147,7 @@ class Incident(Base):
     reviewed_status = Column(String, default="FLAGGED_FOR_REVIEW")  # FLAGGED_FOR_REVIEW, CONFIRMED, FALSE_ALARM
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    video = relationship("Video", back_populates="incidents")
+    video = sql_relationship("Video", back_populates="incidents")
 
 
 class EmergencyContact(Base):
@@ -170,9 +170,9 @@ class EmergencyContact(Base):
     opted_out = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    user = relationship("User", back_populates="emergency_contacts")
-    verifications = relationship("ContactVerification", back_populates="contact", cascade="all, delete-orphan")
-    alert_logs = relationship("AlertLog", back_populates="contact", cascade="all, delete-orphan")
+    user = sql_relationship("User", back_populates="emergency_contacts")
+    verifications = sql_relationship("ContactVerification", back_populates="contact", cascade="all, delete-orphan")
+    alert_logs = sql_relationship("AlertLog", back_populates="contact", cascade="all, delete-orphan")
 
 
 class ContactVerification(Base):
@@ -185,7 +185,7 @@ class ContactVerification(Base):
     attempts = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    contact = relationship("EmergencyContact", back_populates="verifications")
+    contact = sql_relationship("EmergencyContact", back_populates="verifications")
 
 
 class AlertLog(Base):
@@ -200,4 +200,4 @@ class AlertLog(Base):
     sent_at = Column(DateTime, default=datetime.datetime.utcnow)
     acknowledged_at = Column(DateTime, nullable=True)
 
-    contact = relationship("EmergencyContact", back_populates="alert_logs")
+    contact = sql_relationship("EmergencyContact", back_populates="alert_logs")
