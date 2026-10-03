@@ -6,7 +6,7 @@ Accident / Vehicle Collision detector plugin wrapping existing accident logic.
 from typing import List, Dict, Any, Optional
 from detectors.base import BaseDetector, IncidentData, SEVERITY_MEDIUM, SEVERITY_HIGH, SEVERITY_CRITICAL
 from detectors.registry import register_detector
-from accident_detector import AccidentDetector
+from backend.app.services.accident_detector import AccidentDetector
 
 
 @register_detector

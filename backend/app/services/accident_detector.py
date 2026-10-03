@@ -18,7 +18,7 @@ model, but it works well for demo footage of staged/real collisions.
 
 import math
 import time
-import config
+from backend.app.services import config
 
 
 def _speed(history):

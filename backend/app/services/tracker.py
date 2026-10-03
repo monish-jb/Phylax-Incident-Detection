@@ -7,7 +7,7 @@ centroid so we can compute speed and direction changes across frames.
 import math
 from collections import deque
 from deep_sort_realtime.deepsort_tracker import DeepSort
-import config
+from backend.app.services import config
 
 
 class VehicleTracker:

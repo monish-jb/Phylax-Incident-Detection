@@ -1,6 +1,6 @@
 import logging
 from ultralytics import YOLO
-import config
+from backend.app.services import config
 
 logger = logging.getLogger(__name__)
 

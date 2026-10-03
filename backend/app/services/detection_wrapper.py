@@ -9,9 +9,9 @@ from datetime import datetime
 
 # Import workspace root modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
-import config
-from detector import VehicleDetector
-from tracker import VehicleTracker
+from backend.app.services import config
+from backend.app.services.detector import VehicleDetector
+from backend.app.services.tracker import VehicleTracker
 from detectors import DetectorRegistry
 from alert_engine import AlertEngine
 from profiles import LOCATION_PROFILES, get_profile_detectors
