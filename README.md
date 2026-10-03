@@ -1,103 +1,73 @@
-# TRAFFIC CONTROL ROOM // AUTO ACCIDENT DETECTION SYSTEM
+# PHYLAX — GENERAL-PURPOSE AI CAMERA SURVEILLANCE PLATFORM
+> **Tagline:** *Detect. Alert. Protect.*
 
-An enterprise-grade, full-stack **Incident Command Center & Automatic Accident Detection Web System** built with **FastAPI**, **React + Vite**, **SQLAlchemy**, **YOLOv8**, and **DeepSORT**.
-
----
-
-## 🌟 Key Features
-
-1. **Wrapped AI Detection Engine**: Wraps `detector.py` (YOLOv8 vehicle detection), `tracker.py` (DeepSORT trajectory tracking), and `accident_detector.py` (sudden deceleration, collision IoU overlap, erratic spin-out angles).
-2. **FastAPI REST & WebSocket Backend**:
-   - JWT Authentication with bcrypt password hashing.
-   - Enforced per-user data isolation on every DB query.
-   - Background processing queue for non-blocking video analysis.
-   - Real-time job progress streaming (`0-100%`) over WebSockets.
-   - HTTP 206 Partial Content Range streaming support for video players.
-3. **Traffic Control Room / Command HUD Frontend**:
-   - **Custom Design System**: Obsidian dark theme (`#070a10`), warning amber (`#f59e0b`), emergency red (`#ef4444`), all-clear cyan (`#06b6d4`), Google Fonts (`Orbitron`, `Share Tech Mono`, `Plus Jakarta Sans`).
-   - **Surveillance Monitor Wall**: CRT scanline monitor grid with live REC timestamps and pulsing status LEDs.
-   - **Interactive Timeline Scrubber**: Clickable glowing red diamond incident markers jumping directly to crash frames.
-   - **Tactical Radar Sweep**: Live radar sweep animation during background video analysis.
-   - **Glitch Alert Treatment**: Flashing hazard warning overlay on crash detection.
-   - **City Grid Activity Heatmap**: Tactical 7-day metric matrix.
+Phylax ("guardian") is an enterprise-grade, full-stack **General-Purpose AI Camera Surveillance & Emergency Dispatch Platform** built with **FastAPI**, **React + Vite**, **SQLAlchemy**, **YOLOv8**, and **DeepSORT**.
 
 ---
 
-## 📁 Repository Structure
+## 🛡️ Modular Detector Plugin Architecture
 
-```
-Auto-Accident-Detection/
-├── backend/
-│   ├── app/
-│   │   ├── core/           # Config, DB engine, JWT/bcrypt security
-│   │   ├── models/         # SQLAlchemy models (User, Video, AnalysisJob, Incident)
-│   │   ├── schemas/        # Pydantic request/response validation schemas
-│   │   ├── api/            # API endpoints (auth, videos, dashboard)
-│   │   ├── services/       # Detection pipeline wrapper & WebSocket manager
-│   │   └── main.py         # FastAPI application factory & CORS setup
-│   ├── tests/              # Pytest backend test suite
-│   ├── seed.py             # Database seed script for demo officer account
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── assets/         # Tactical HUD design tokens & CRT styles
-│   │   ├── components/     # HeaderNavbar, RadarSweep, IncidentScrubber
-│   │   ├── context/        # AuthContext
-│   │   ├── pages/          # Login, Dashboard, Upload, SurveillanceWall, VideoDetail, Settings
-│   │   ├── services/       # Axios API client
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-├── storage/                # Persistent file storage
-│   ├── uploads/            # Raw uploaded videos
-│   ├── annotated/          # Processed annotated videos with bounding boxes & banners
-│   ├── thumbnails/         # Incident keyframe images
-│   └── posters/            # Video poster snapshots
-├── start_app.bat           # One-command batch script to start both servers
-└── README.md
-```
+Phylax features a clean, extensible plugin system supporting 9 specialized detector plugins:
+
+1. **Accident & Collision Detector** (`detectors/accident.py`): Vehicle impact IoU overlap, sudden deceleration, and erratic spin-outs.
+2. **Theft & Shoplifting Detector** (`detectors/theft.py`): Lingering near restricted counters and item concealment behavior.
+3. **Perimeter Intrusion Detector** (`detectors/intrusion.py`): Polygon boundary crossing during monitored hours.
+4. **Suspicious Loitering Detector** (`detectors/loitering.py`): Stationarity timer in sensitive target zones.
+5. **Fire & Smoke Detector** (`detectors/fire_smoke.py`): HSV flame dynamics & smoke mask accumulation.
+6. **Crowd Density & Overcrowding Detector** (`detectors/crowd_density.py`): Real-time human capacity tracking.
+7. **Fall Detection Plugin** (`detectors/fall.py`): Posture aspect ratio & post-fall immobility verification.
+8. **Fight & Physical Violence Detector** (`detectors/fight.py`): Rapid kinetic velocity interaction spikes between tracks.
+9. **Abandoned Object Detector** (`detectors/abandoned_object.py`): Stationary luggage/bag detection with no nearby owner.
+
+---
+
+## 🏛️ Location Surveillance Profiles
+
+Select from 6 location presets or configure custom thresholds:
+- **Home / Residential**: Intrusion, Fall, Fire/Smoke, Loitering.
+- **Shop / Retail Store**: Theft, Loitering, Intrusion, Crowd Density, Fire/Smoke.
+- **Shopping Mall**: Crowd Density, Abandoned Object, Theft, Fight, Fire/Smoke.
+- **Cinema / Theatre**: Crowd Density, Abandoned Object, Fight, Fire/Smoke, Fall.
+- **Office / Warehouse Facility**: Intrusion, After-Hours Movement, Fire/Smoke, Fall.
+- **Roadway / Parking Lot**: Vehicle Collisions, Loitering, Fire/Smoke.
+
+---
+
+## 🚨 Emergency Contacts & Alert Escalation
+
+- **Mandatory Onboarding Guard**: Users must add and verify at least one emergency contact before accessing dashboard features.
+- **Multi-Channel Dispatch**: SMS, WhatsApp, Email, and Voice Call notification logging.
+- **Token-Based Acknowledgment**: Signed JWT token links allow contacts to acknowledge alert dispatches.
+- **Operator Review Workflow**: All detections are labeled `"FLAGGED_FOR_REVIEW"` for human verification before status is updated to `CONFIRMED` or `FALSE_ALARM`.
+
+---
+
+## 📄 Audit & Report Exporting
+
+- **JSON Report Export**: Download complete incident timeline audit logs.
+- **PDF/HTML Printable Report**: Download styled surveillance executive summary.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### 1. Prerequisites
-Ensure Python 3.10+ and Node.js v18+ are installed.
-
-### 2. Database Seeding
-To populate the default command officer account:
+### 1. Database Setup & Seeding
+Populate demo user accounts and default emergency contacts:
 ```bash
-C:\v\Scripts\python.exe backend/seed.py
+python seed_demo_data.py
 ```
-- **Demo Account**: Username `command` | Password `control123` | Email `command@control.gov`
+- **Demo Account**: Username `demo` | Password `demo123`
+- **Command Account**: Username `command` | Password `control123`
 
-### 3. Run Backend API Server
+### 2. Run Backend API Server
 ```bash
-C:\v\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-- **API Server**: `http://127.0.0.1:8000`
-- **Auto-Generated Swagger Docs**: `http://127.0.0.1:8000/docs`
+- API Docs: `http://localhost:8000/docs`
 
-### 4. Run Frontend Console
+### 3. Run Frontend Console
 ```bash
 cd frontend
 npm run dev
 ```
-- **Frontend Command Center**: `http://localhost:3000`
-
-### 5. One-Command Starter (Windows)
-Double click `start_app.bat` or run:
-```cmd
-start_app.bat
-```
-
----
-
-## 🧪 Running Automated Tests
-
-Run the backend Pytest test suite covering authentication, per-user data isolation, file upload validation, and job status management:
-```bash
-C:\v\Scripts\pytest.exe backend/tests/test_all.py
-```
+- Web Application: `http://localhost:3000`

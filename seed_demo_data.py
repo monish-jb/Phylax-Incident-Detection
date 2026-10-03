@@ -11,8 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from backend.app.core.database import SessionLocal, engine, Base, migrate_db
 from backend.app.models.all_models import User, Camera, Zone, EmergencyContact, Video, AnalysisJob, Incident
-from backend.app.core.security import get_password_hash
-from detectors.registry import DetectorRegistry
+from backend.app.core.security import hash_password
 import detectors  # ensures all plugins are registered
 
 def seed():
@@ -27,7 +26,7 @@ def seed():
             demo_user = User(
                 email="demo@phylax.ai",
                 username="demo",
-                hashed_password=get_password_hash("demo123"),
+                hashed_password=hash_password("demo123"),
                 full_name="Phylax Security Officer",
                 location_type="SHOP_RETAIL",
                 onboarding_completed=True
@@ -43,7 +42,7 @@ def seed():
             cmd_user = User(
                 email="command@control.gov",
                 username="command",
-                hashed_password=get_password_hash("control123"),
+                hashed_password=hash_password("control123"),
                 full_name="Incident Command Officer",
                 location_type="ROAD_PARKING",
                 onboarding_completed=True
@@ -113,7 +112,7 @@ def seed():
             db.add(cam2)
             db.commit()
 
-        print("Seeded camera profiles.")
+        print("Seeded camera profiles successfully.")
         print("Demo database seeding complete!")
 
     finally:
