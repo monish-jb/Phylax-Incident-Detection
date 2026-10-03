@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Monitor, Search, Filter, Trash2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Monitor, Search, Filter, Trash2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export const SurveillanceWall = () => {
   const [videos, setVideos] = useState([]);
   const [search, setSearch] = useState('');
-  const [filterAccident, setFilterAccident] = useState('all'); // all, accident, normal
+  const [filterAccident, setFilterAccident] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,11 +47,11 @@ export const SurveillanceWall = () => {
       {/* Header Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-hud)', fontSize: '22px', letterSpacing: '2px' }}>
-            SURVEILLANCE MONITOR WALL
+          <h1 style={{ fontFamily: 'var(--font-hud)', fontSize: '22px', letterSpacing: '2px', color: 'var(--text-main)' }}>
+            PHYLAX SURVEILLANCE WALL
           </h1>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-dim)' }}>
-            CITY-WIDE MONITORED FEEDS & INCIDENT HISTORY TILES
+            MONITORED CAMERA FEEDS, LOCATION PROFILES & FLAGGED INCIDENTS
           </p>
         </div>
 
@@ -80,21 +80,21 @@ export const SurveillanceWall = () => {
           <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', borderRadius: '4px', border: '1px solid var(--hud-panel-border)' }}>
             <button
               onClick={() => setFilterAccident('all')}
-              style={{ padding: '6px 12px', background: filterAccident === 'all' ? 'var(--hud-cyan)' : 'transparent', color: filterAccident === 'all' ? '#000' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px' }}
+              style={{ padding: '6px 12px', background: filterAccident === 'all' ? 'var(--hud-cyan)' : 'transparent', color: filterAccident === 'all' ? '#000' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}
             >
               ALL FEEDS
             </button>
             <button
               onClick={() => setFilterAccident('accident')}
-              style={{ padding: '6px 12px', background: filterAccident === 'accident' ? 'var(--hud-red)' : 'transparent', color: filterAccident === 'accident' ? '#fff' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px' }}
+              style={{ padding: '6px 12px', background: filterAccident === 'accident' ? 'var(--hud-red)' : 'transparent', color: filterAccident === 'accident' ? '#fff' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}
             >
-              ACCIDENTS
+              INCIDENTS FLAGGED
             </button>
             <button
               onClick={() => setFilterAccident('normal')}
-              style={{ padding: '6px 12px', background: filterAccident === 'normal' ? 'var(--hud-green)' : 'transparent', color: filterAccident === 'normal' ? '#000' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px' }}
+              style={{ padding: '6px 12px', background: filterAccident === 'normal' ? 'var(--hud-green)' : 'transparent', color: filterAccident === 'normal' ? '#000' : 'var(--text-dim)', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600 }}
             >
-              NORMAL
+              CLEAR FEEDS
             </button>
           </div>
 
@@ -104,7 +104,7 @@ export const SurveillanceWall = () => {
       {/* Surveillance Tiles Grid */}
       {loading ? (
         <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-mono)', color: 'var(--hud-cyan)' }}>
-          LOADING SURVEILLANCE WALL MONITOR TILES...
+          LOADING PHYLAX SURVEILLANCE WALL MONITOR TILES...
         </div>
       ) : videos.length === 0 ? (
         <div className="hud-card" style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
@@ -118,9 +118,9 @@ export const SurveillanceWall = () => {
               <div className="surveillance-header-overlay">
                 <span className="rec-badge">
                   <span className={`led-indicator ${video.has_accident ? 'led-red' : 'led-green'}`}></span>
-                  {video.has_accident ? 'ACCIDENT DETECTED' : 'NORMAL'}
+                  {video.profile || 'ROAD_PARKING'}
                 </span>
-                <span className="cam-name-badge">CAM-{video.id.toString().padStart(3, '0')}</span>
+                <span className="cam-name-badge">FEED-{video.id.toString().padStart(3, '0')}</span>
               </div>
 
               <Link to={`/videos/${video.id}`}>
@@ -148,7 +148,7 @@ export const SurveillanceWall = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
                   <span>FPS: {video.fps || 30.0} | {video.duration_sec ? `${video.duration_sec.toFixed(1)}s` : 'Processing'}</span>
                   <span style={{ color: video.has_accident ? 'var(--hud-red)' : 'var(--hud-green)', fontWeight: 'bold' }}>
-                    SCORE: {video.max_score}
+                    {video.max_score} FLAGGED EVENTS
                   </span>
                 </div>
               </div>

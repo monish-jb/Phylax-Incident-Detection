@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
 from backend.app.core.security import hash_password, verify_password, create_access_token, decode_access_token
-from backend.app.models.all_models import User
+from backend.app.models.all_models import User, EmergencyContact
 from backend.app.schemas.all_schemas import UserRegister, UserLogin, UserOut, Token
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -33,6 +33,34 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
+def require_verified_onboarding(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> User:
+    """
+    Onboarding Guard Middleware:
+    Enforces mandatory emergency contact registration and OTP verification.
+    """
+    if current_user.onboarding_completed:
+        return current_user
+
+    # Auto-heal/sync if user already has at least one verified emergency contact
+    verified_contacts_count = db.query(EmergencyContact).filter(
+        EmergencyContact.user_id == current_user.id,
+        EmergencyContact.verified == True
+    ).count()
+
+    if verified_contacts_count >= 1:
+        current_user.onboarding_completed = True
+        db.commit()
+        return current_user
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="ONBOARDING_REQUIRED: Mandatory Emergency Contact registration and verification required before accessing surveillance command features."
+    )
+
+
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserRegister, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(
@@ -45,7 +73,9 @@ def register_user(user_in: UserRegister, db: Session = Depends(get_db)):
         email=user_in.email,
         username=user_in.username,
         hashed_password=hash_password(user_in.password),
-        full_name=user_in.full_name or user_in.username
+        full_name=user_in.full_name or user_in.username,
+        location_type="HOME",
+        onboarding_completed=False
     )
     db.add(user)
     db.commit()

@@ -1,9 +1,10 @@
 import os
 
 class Settings:
-    PROJECT_NAME: str = "Traffic Control Room Auto-Accident Detection API"
-    VERSION: str = "2.0.0"
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "super_secret_traffic_control_jwt_key_2026_xyz")
+    PROJECT_NAME: str = "Phylax — AI Camera Surveillance Platform"
+    TAGLINE: str = "Detect. Alert. Protect."
+    VERSION: str = "3.0.0"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "phylax_guardian_jwt_secret_key_2026_secure")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
@@ -19,7 +20,7 @@ class Settings:
     POSTERS_DIR: str = os.path.join(STORAGE_DIR, "posters")
 
     # Upload validation
-    MAX_UPLOAD_SIZE_BYTES: int = 100 * 1024 * 1024  # 100 MB
+    MAX_UPLOAD_SIZE_BYTES: int = 200 * 1024 * 1024  # 200 MB
     ALLOWED_EXTENSIONS: set = {"mp4", "avi", "mov", "mkv"}
 
     def __init__(self):

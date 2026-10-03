@@ -2,11 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { RadarSweep } from '../components/RadarSweep';
-import { UploadCloud, FileVideo, CheckCircle2, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileVideo, CheckCircle2, AlertCircle, Shield, Settings } from 'lucide-react';
+
+const LOCATION_PROFILES = [
+  { id: 'HOME', label: 'Home / Residential', detectors: ['Intrusion', 'Fall', 'Fire/Smoke', 'Loitering'] },
+  { id: 'SHOP_RETAIL', label: 'Shop / Retail Store', detectors: ['Theft', 'Loitering', 'Intrusion', 'Crowd Density', 'Fire/Smoke'] },
+  { id: 'MALL', label: 'Shopping Mall', detectors: ['Crowd Density', 'Abandoned Object', 'Theft', 'Fight', 'Fire/Smoke'] },
+  { id: 'CINEMA_THEATRE', label: 'Cinema / Theatre', detectors: ['Crowd Density', 'Abandoned Object', 'Fight', 'Fire/Smoke', 'Fall'] },
+  { id: 'OFFICE_WAREHOUSE', label: 'Office / Warehouse', detectors: ['Intrusion', 'After-Hours', 'Fire/Smoke', 'Fall'] },
+  { id: 'ROAD_PARKING', label: 'Road / Parking Lot', detectors: ['Accident', 'Loitering', 'Fire/Smoke'] },
+];
 
 export const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [profile, setProfile] = useState('ROAD_PARKING');
+  const [cameraName, setCameraName] = useState('Camera Feed #1');
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
@@ -20,8 +31,8 @@ export const Upload = () => {
       return;
     }
 
-    if (file.size > 100 * 1024 * 1024) {
-      setError('File exceeds max size limit of 100MB.');
+    if (file.size > 200 * 1024 * 1024) {
+      setError('File exceeds max size limit of 200MB.');
       return;
     }
 
@@ -49,7 +60,6 @@ export const Upload = () => {
     formData.append('file', selectedFile);
 
     try {
-      // Simulate progress ticks
       const timer = setInterval(() => {
         setProgress((prev) => (prev >= 85 ? prev : prev + 10));
       }, 500);
@@ -71,15 +81,15 @@ export const Upload = () => {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 24px' }}>
+    <div style={{ maxWidth: '840px', margin: '30px auto', padding: '0 24px' }}>
       <div className="hud-card">
         
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '20px', letterSpacing: '2px' }}>
-            TACTICAL FEED UPLOAD PORTAL
+          <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '20px', letterSpacing: '2px', color: 'var(--hud-cyan)' }}>
+            PHYLAX SURVEILLANCE FEED INGESTION
           </h2>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--hud-cyan)', marginTop: '4px' }}>
-            SUBMIT SURVEILLANCE FOOTAGE FOR AUTOMATED ACCIDENT DETECTION
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-dim)', marginTop: '4px' }}>
+            SUBMIT CAMERA FOOTAGE FOR MULTI-DETECTOR AI INCIDENT ANALYSIS
           </p>
         </div>
 
@@ -90,9 +100,52 @@ export const Upload = () => {
         )}
 
         {uploading ? (
-          <RadarSweep progress={progress} statusText="EXECUTING YOLOv8 & DEEPSORT ANALYSIS..." />
+          <RadarSweep progress={progress} statusText="RUNNING PHYLAX SHARED YOLO & MULTI-DETECTOR PIPELINE..." />
         ) : (
           <form onSubmit={handleUploadSubmit}>
+            
+            {/* Configuration Options */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <label className="cmd-label">Location Surveillance Profile</label>
+                <select
+                  className="cmd-input"
+                  value={profile}
+                  onChange={(e) => setProfile(e.target.value)}
+                >
+                  {LOCATION_PROFILES.map(p => (
+                    <option key={p.id} value={p.id}>{p.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="cmd-label">Camera / Feed Label</label>
+                <input
+                  type="text"
+                  className="cmd-input"
+                  value={cameraName}
+                  onChange={(e) => setCameraName(e.target.value)}
+                  placeholder="e.g. Front Door, Cash Counter, Screen 2"
+                />
+              </div>
+            </div>
+
+            {/* Active Detectors Display */}
+            <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', padding: '12px 16px', borderRadius: '6px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--hud-cyan)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Shield size={14} /> Auto-Enabled AI Detectors for {profile}:
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {(LOCATION_PROFILES.find(p => p.id === profile)?.detectors || []).map(d => (
+                  <span key={d} style={{ background: 'rgba(6, 182, 212, 0.15)', color: 'var(--hud-cyan)', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 600 }}>
+                    ✓ {d}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* File Dropzone */}
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
@@ -100,7 +153,7 @@ export const Upload = () => {
               style={{
                 border: '2px dashed var(--hud-panel-border)',
                 borderRadius: '8px',
-                padding: '40px',
+                padding: '36px',
                 textAlign: 'center',
                 background: 'rgba(0,0,0,0.4)',
                 cursor: 'pointer',
@@ -108,12 +161,12 @@ export const Upload = () => {
                 transition: 'all 0.2s'
               }}
             >
-              <UploadCloud size={48} color="var(--hud-cyan)" style={{ marginBottom: '12px' }} />
-              <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '16px', marginBottom: '6px' }}>
-                DRAG & DROP SURVEILLANCE VIDEO HERE
+              <UploadCloud size={44} color="var(--hud-cyan)" style={{ marginBottom: '10px' }} />
+              <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '15px', marginBottom: '6px' }}>
+                DRAG & DROP SURVEILLANCE VIDEO FILE HERE
               </h3>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-dim)' }}>
-                Supports .MP4, .AVI, .MOV, .MKV (Max limit: 100MB)
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-dim)' }}>
+                Supports .MP4, .AVI, .MOV, .MKV (Max limit: 200MB)
               </p>
               <input
                 type="file"
@@ -142,9 +195,9 @@ export const Upload = () => {
               type="submit"
               disabled={!selectedFile}
               className="cmd-btn cmd-btn-primary"
-              style={{ width: '100%', justifyContent: 'center', opacity: selectedFile ? 1 : 0.5 }}
+              style={{ width: '100%', justifyContent: 'center', opacity: selectedFile ? 1 : 0.5, padding: '12px', fontSize: '13px' }}
             >
-              <CheckCircle2 size={16} /> SUBMIT FEED FOR AI ANALYSIS
+              <CheckCircle2 size={16} /> START PHYLAX AI DETECTION PROCESS
             </button>
           </form>
         )}

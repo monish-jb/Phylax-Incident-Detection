@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert, KeyRound, UserCheck, Zap } from 'lucide-react';
+import { Shield, KeyRound, Zap } from 'lucide-react';
 
 export const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -19,11 +19,20 @@ export const Login = () => {
     setError('');
     try {
       if (isRegister) {
-        await register(email, username, password, fullName);
+        const u = await register(email, username, password, fullName);
+        if (u && !u.onboarding_completed) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
-        await login(username, password);
+        const u = await login(username, password);
+        if (u && !u.onboarding_completed) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       }
-      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.detail || 'Authentication failed');
     }
@@ -32,13 +41,20 @@ export const Login = () => {
   const handleDemoLogin = async () => {
     setError('');
     try {
-      await login('command', 'control123');
-      navigate('/dashboard');
-    } catch (err) {
-      // If demo user doesn't exist yet, auto register
-      try {
-        await register('command@control.gov', 'command', 'control123', 'Incident Command Officer');
+      const u = await login('command', 'control123');
+      if (u && !u.onboarding_completed) {
+        navigate('/onboarding');
+      } else {
         navigate('/dashboard');
+      }
+    } catch (err) {
+      try {
+        const u = await register('command@control.gov', 'command', 'control123', 'Incident Command Officer');
+        if (u && !u.onboarding_completed) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
       } catch (rErr) {
         setError('Demo authentication failed');
       }
@@ -46,19 +62,22 @@ export const Login = () => {
   };
 
   return (
-    <div className="crt-overlay" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyCenter: 'center', padding: '20px' }}>
+    <div className="crt-overlay" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div style={{ maxWidth: '440px', width: '100%', margin: '0 auto' }}>
         <div className="hud-card" style={{ padding: '36px' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid var(--hud-red)', borderRadius: '8px', marginBottom: '12px' }}>
-              <ShieldAlert size={36} color="var(--hud-red)" />
+            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(6, 182, 212, 0.15)', border: '1px solid var(--hud-cyan)', borderRadius: '8px', marginBottom: '12px' }}>
+              <Shield size={36} color="var(--hud-cyan)" />
             </div>
-            <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '20px', letterSpacing: '2px', color: 'var(--text-main)' }}>
-              INCIDENT COMMAND ACCESS
+            <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '22px', letterSpacing: '2px', color: 'var(--text-main)', margin: '0 0 4px' }}>
+              PHYLAX SURVEILLANCE
             </h2>
-            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--hud-cyan)', marginTop: '4px' }}>
-              AUTHENTICATION REQUIRED FOR DISPATCH SYSTEM
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--hud-cyan)', letterSpacing: '1px', fontWeight: 600 }}>
+              Detect. Alert. Protect.
+            </div>
+            <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '6px' }}>
+              General-Purpose AI Camera Surveillance Platform
             </p>
           </div>
 
@@ -116,12 +135,12 @@ export const Login = () => {
               />
             </div>
 
-            <button type="submit" className="cmd-btn cmd-btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: '16px' }}>
-              <KeyRound size={16} /> {isRegister ? 'REGISTER COMMAND OFFICER' : 'ACCESS CONTROL ROOM'}
+            <button type="submit" className="cmd-btn cmd-btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: '16px', padding: '12px' }}>
+              <KeyRound size={16} /> {isRegister ? 'REGISTER & BEGIN ONBOARDING' : 'LOGIN TO PHYLAX'}
             </button>
 
-            <button type="button" onClick={handleDemoLogin} className="cmd-btn cmd-btn-secondary" style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--hud-amber)', color: 'var(--hud-amber)' }}>
-              <Zap size={16} /> AUTOLOGIN DEMO OFFICER (COMMAND)
+            <button type="button" onClick={handleDemoLogin} className="cmd-btn cmd-btn-secondary" style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--hud-amber)', color: 'var(--hud-amber)', padding: '12px' }}>
+              <Zap size={16} /> AUTOLOGIN DEMO ACCOUNT
             </button>
           </form>
 
@@ -131,7 +150,7 @@ export const Login = () => {
               onClick={() => setIsRegister(!isRegister)}
               style={{ background: 'none', border: 'none', color: 'var(--hud-cyan)', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '12px' }}
             >
-              {isRegister ? 'Already have access? Log in here' : 'Need new command credentials? Register here'}
+              {isRegister ? 'Already have credentials? Login here' : 'New to Phylax? Register here'}
             </button>
           </div>
 
